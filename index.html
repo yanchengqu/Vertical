@@ -19,6 +19,10 @@
 		margin: 0;
 		padding: 0;
 	}
+	body {
+		background: #333;
+		height: 100%;
+	}
 	li{
 		list-style: none;
 		display:-webkit-box;
@@ -40,7 +44,7 @@
 }
 .wrap > div {
   width:100%;
-  position: absolute;
+  position: relative;
   box-sizing:border-box;
   -webkit-box-sizing:border-box;
   -moz-box-sizing:border-box;
@@ -250,9 +254,23 @@
 		letter-spacing: 4px;
 		border-bottom: 4px solid #82171B;
 	}
+	.bg{
+		position:absolute;
+		z-index= -1;
+		color:#666;
+		text-align: center;
+		width: 100%;
+		font-size: 12px;
+		margin-top: 10px;
+	}
+	.bt {
+		bottom: 10px;
+		z-index: -1;
+	}
 	</style>
 </head>
 <body>
+<header class="bg">腾讯 大豫网 首届K歌大赛</header>
 <div id="scroll">
 	<div class="wrap">
 	<div id="main1">
@@ -424,6 +442,7 @@
 	</div>
 	</div>
 </div>
+<footer class="bg bt">期待你和你的好声音</footer>
 <script type="text/javascript">
 	var doc = document.querySelectorAll("ul")[0],
 		num = 0;
@@ -476,7 +495,6 @@
 
 			slide.setAttribute('data-index', i + 1);
 			slide.style.height = height + 'px';
-			slide.style.top = top + 'px';
 			top += height;
 			}
 
@@ -484,6 +502,7 @@
 
 		element.style.height = top + 'px';
 		container.style.visibility = 'visible';
+		container.style.height = clientHeight + 'px';
 		}
 		function circle(index){
 			return (3 + index % 3) % 3;
@@ -553,22 +572,25 @@
        				x: touches.pageX - start.x,
       				y: touches.pageY - start.y
      			}
-     			_translate(circle(index-1), dis + delta.y, 0);
-     			_translate(index, dis + delta.y, 0);
-     			_translate(circle(index+1), dis + delta.y, 0);
+     			var fix = clientHeight - slidesHeight[index + 1];
      			tmp = dis + delta.y;
+     			tmp = tmp > 0 || tmp < fix ? tmp > 0 ? tmp / 3 : fix + (tmp - fix) / 3 : tmp;
+     			console.log(tmp);
+     			_translate(circle(index-1), tmp, 0);
+     			_translate(index, tmp, 0);
+     			_translate(circle(index+1), tmp, 0);
 			},
 			end:function(event){
-				dis = tmp;
+
 				var recprev = clientHeight - slidesHeight[index];
 				var recnext = clientHeight - slidesHeight[index + 1];
  				var duration = +new Date - start.time;
  				var direction = tmp > 0 ? -1 : 1;  //  1 next -1 prev
 
       			var isValidSlide =
-            	Number(duration) < 150            
-            	&& Math.abs(dis) > 100            
-            	|| Math.abs(dis) > clientHeight/2;     
+            	Number(duration) < 250            
+            	&& Math.abs(tmp) > 100            
+            	|| Math.abs(tmp) > clientHeight / 5;     
 
             	var isMove = !(direction===-1 && index===0 || (direction===1 && index===2));
 
@@ -601,6 +623,8 @@
      					_translate(circle(index+1), recnext, 300);
      					dis = recnext;
      					}
+					} else {
+						dis = tmp;
 					}
             	}
  
