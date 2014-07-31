@@ -31,7 +31,8 @@
 		display:-ms-flexbox;
 		display: flex;
 		width: 95%;
-		margin: 12px auto;
+		margin: 0 auto;
+		padding: 7px 0;
 	}
 #scroll {
   overflow: hidden;
@@ -205,8 +206,7 @@
 		top: -0.5em;
 	}
 	#main3 ul{
-		height: 456px;
-		overflow: hidden;
+		height: auto;
 	}
 	ul .active img{
 		border-color: #090;
@@ -267,6 +267,10 @@
 		bottom: 10px;
 		z-index: -1;
 	}
+	.list {
+		overflow: hidden;
+		height: 456px;
+	}
 	</style>
 </head>
 <body>
@@ -294,6 +298,7 @@
 		<p class="tip">向上滑动给心仪的选手投票</p>
 	</div>
 	<div id="main3">
+		<div class="list">
 		<ul>
 			<li>
 				<img src="http://mat1.gtimg.com/henan/2014sing/player.jpg">
@@ -428,6 +433,7 @@
 				</span>
 			</li>
 		</ul>
+		</div>
 		<form>
 			<div>
 			<span>请留下你的姓名</span>
@@ -444,11 +450,27 @@
 </div>
 <footer class="bg bt">期待你和你的好声音</footer>
 <script type="text/javascript">
-	var doc = document.querySelectorAll("ul")[0],
-		num = 0;
-	doc.addEventListener ? doc.addEventListener("click",handle,false) :
-	doc.attachEvent("onclick",handle);
+	var doc = document.querySelectorAll('ul')[0],
+		len = doc.children.length,
+		style = doc && doc.style,
+		num = 0,
+		liHeight = doc.children[0].getBoundingClientRect().height || doc.children[0].offsetHeight,
+		fix = liHeight *(len - 7);
+
+	style.height = liHeight * len + 'px';
+
+	doc.addEventListener("click",handle,false);
+	doc.addEventListener("touchstart",handle,false);
 	function handle(e){
+		switch (e.type) {
+			case 'click' : vote(e); break;
+			case 'touchstart' : touchStart(e); break;
+			case 'touchmove' : touchMove(e); break;
+			case 'touchend' : touchEnd(e); break;
+		}
+		e.stopPropagation();
+	}
+	function vote(e){
 		var e = e.target;
 		if (e.tagName.toLowerCase()==='ul') return false;
 		var e = e.parentNode;
@@ -461,6 +483,65 @@
 		}
 		e.classList.toggle('active');
 		num += hasClassActive ? -1 : 1;
+	}
+	function translate(obj,dist,speed){
+			if (!obj) return;
+
+			style.webkitTransitionDuration =
+    		style.MozTransitionDuration =
+    		style.msTransitionDuration =
+    		style.OTransitionDuration =
+    		style.transitionDuration = speed + 'ms';
+
+    		style.webkitTransform = 'translate(0,' + dist + 'px)' + 'translateZ(0)';
+    		style.msTransform =
+    		style.MozTransform =
+    		style.OTransform = 'translateY(' + dist + 'px)';
+	}
+	function touchStart(e){
+		var touches = e.touches[0];
+		start = {
+			x : touches.pageX,
+			y : touches.pageY,
+			time : +new Date
+		}
+		delta = {};
+		doc.addEventListener('touchmove',handle,false);
+		doc.addEventListener('touchend',handle,false);
+	}
+	function touchMove(e){
+		if (typeof tEnd == 'undefined') tEnd = 0;
+		e.preventDefault();
+		var touches = e.touches[0];
+		delta = {
+			x : touches.pageX - start.x,
+			y : touches.pageY - start.y,
+		}
+		t = tEnd + delta.y;
+		t = t > 0 || t < -fix ? t > 0 ? t / 3 : -fix + (t + fix) / 3 : t;
+		translate(style, t, 0);
+	}
+	function touchEnd(e){
+
+		var duration = +new Date - start.time;
+		var s = Math.floor(delta.y / duration * 100); 
+ 		var direction = t > 0 ? -1 : 1;  //  1 next -1 prev
+
+ 		t = t > 0 ? 0 : t < - fix ? - fix : t;
+      	translate(style, t, 300);
+      	if(t < 0 && t > - fix){
+      		t = t + s;
+      		t = t > 0 || t < -fix ? t > 0 ? t / 5 : -fix + (t + fix) / 5 : t;
+      		translate(style, t, 300);
+      		t = t > 0 ? 0 : t < - fix ? - fix : t;
+      		setTimeout(function(){
+      			translate(style, t, 200);
+      		},300);
+      	}
+      	tEnd = t;
+
+		doc.removeEventListener('touchmove',handle,false);
+		doc.removeEventListener('touchend',handle,false);
 	}
 
 
@@ -575,7 +656,7 @@
      			var fix = clientHeight - slidesHeight[index + 1];
      			tmp = dis + delta.y;
      			tmp = tmp > 0 || tmp < fix ? tmp > 0 ? tmp / 3 : fix + (tmp - fix) / 3 : tmp;
-     			console.log(tmp);
+
      			_translate(circle(index-1), tmp, 0);
      			_translate(index, tmp, 0);
      			_translate(circle(index+1), tmp, 0);
