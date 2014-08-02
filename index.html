@@ -5,15 +5,6 @@
 	<meta name="viewport" content="width=device-width,initial-scale=1.0, maximum-scale=1" />
 	<meta name="format-detection" content="telephone=no" />
 	<title>大豫好声音</title>
-	<script type="text/javascript">
-	window.onload = function(){
-		document.body.style.fontSize = parseInt(document.documentElement.clientHeight* 0.05) + 'px';
-		scroll(sc);
-	}
-	window.onresize = function(){
-		document.body.style.fontSize = parseInt(document.documentElement.clientHeight* 0.05) + 'px';
-	}
-	</script>
 	<style type="text/css">
 	div,body,html,h2,ul,img,li{
 		margin: 0;
@@ -591,6 +582,14 @@
 </div>
 <footer class="bg bt">期待你和你的好声音</footer>
 <script type="text/javascript">
+	window.onload = function(){
+		document.body.style.fontSize = ~~document.documentElement.clientHeight* 0.05 + 'px';
+		scroll(sc);
+	}
+	window.onresize = function(){
+		document.body.style.fontSize = ~~document.documentElement.clientHeight* 0.05 + 'px';
+	}
+
 	var doc = document.querySelector('ul'),
 		len = doc.children.length,
 		style = doc && doc.style,
